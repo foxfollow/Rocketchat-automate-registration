@@ -104,7 +104,7 @@ def answer(url_server):
             textarea_elem.send_keys(Keys.ENTER)
 
 
-def main(operator):
+def mainSender(operator):
     if operator > 100:
         operator -= 100
         url_server = f'http://10.10.20.{str(operator)}:3000/'  # TODO: change url
@@ -116,7 +116,7 @@ def main(operator):
         print("wrong value operator")
 
 
-def parallelMain():
+def parallelMainSender():
     listPart = [34, 33, 31]    # TODO: add ips
     listOfIps = []
     for ip in listPart:
@@ -124,9 +124,7 @@ def parallelMain():
         listOfIps.append(ip + 100)
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
-        executor.map(main, listOfIps)
+        executor.map(mainSender, listOfIps)
 
 
-print("hello")
-parallelMain()
-print("script ended")
+parallelMainSender()

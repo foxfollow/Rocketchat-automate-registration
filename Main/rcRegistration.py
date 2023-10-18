@@ -223,7 +223,7 @@ def ldap(driver, url_server):
     time.sleep(1)   # Before save
 
 
-def main(third_aktet):
+def mainRegistration(third_aktet):
     url_server = f'http://10.10.20.{third_aktet}:3000/'     # TODO: change url
     """CREATE DRIVER"""
     options = webdriver.FirefoxOptions()
@@ -240,15 +240,13 @@ def main(third_aktet):
     print(f"End script success for server {url_server}")
 
 
-def parallelMain():
+def parallelMainRegistration():
     # listOfIps = [31, 32, 33, 34, 35, 36, 37, 38, 39, 40]
     listOfIps = ["32", "33"]
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
 
-        executor.map(main, listOfIps)
+        executor.map(mainRegistration, listOfIps)
 
 
-print("hello")
-parallelMain()
-print("script ended")
+parallelMainRegistration()
