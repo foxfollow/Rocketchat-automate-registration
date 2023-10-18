@@ -1,3 +1,6 @@
+# C:\Users\h_savoiskyi\AppData\Roaming\Python\Python310\Scripts\pyinstaller.exe
+# $env:Path += ";C:\\Users\\h_savoiskyi\\AppData\\Roaming\\Python\\Python310\\Scripts"
+
 # Import the sys module
 import sys
 import time
