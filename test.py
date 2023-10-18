@@ -1,5 +1,6 @@
 # C:\Users\h_savoiskyi\AppData\Roaming\Python\Python310\Scripts\pyinstaller.exe
 # $env:Path += ";C:\\Users\\h_savoiskyi\\AppData\\Roaming\\Python\\Python310\\Scripts"
+# pyinstaller .\parallelBotFox.py --onefile --hidden-import selenium --icon=icon.ico
 
 # Import the sys module
 import sys
