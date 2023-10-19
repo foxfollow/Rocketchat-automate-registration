@@ -5,11 +5,33 @@
 # Import the sys module
 import sys
 import time
+import subprocess
+import time
+
+ip = "10.10.20.32"
+while True:
+    # Check the status of the service
+    result = subprocess.run(["sudo", "service", "snap.rocketchat-server.rocketchat-server", "status"],
+                            capture_output=True,
+                            text=True)
+
+    if "localhost" in result.stdout:
+        # If localhost exists in the output, set the site URL and restart the service
+        subprocess.run(["sudo", "snap", "set", "rocketchat-server", f"siteurl=http://{ip}:3000"], check=True)
+        subprocess.run(["sudo", "service", "snap.rocketchat-server.rocketchat-server", "restart"], check=True)
+        print("restarting")
+    elif ip in result.stdout:
+        print(f"{ip} exists in the output, break the loop")
+        break
+    else:
+        # If neither localhost nor 10.10.20.33 exist in the output, wait for 10 seconds and repeat
+        print("sleep 10")
+        time.sleep(10)
 
 # Get the input text from the command line arguments
-input_text = " ".join(sys.argv[1:])
-
-# Print the input text to the console
-print(input_text)
-
-time.sleep(5)
+# input_text = " ".join(sys.argv[1:])
+#
+# # Print the input text to the console
+# print(input_text)
+#
+# time.sleep(5)

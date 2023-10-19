@@ -30,11 +30,11 @@ def check_server(driver, url_server):
 
 def login(driver, username, password):
     """Function to handle the login process."""
-    username_elem = driver.find_element(By.ID, 'username')
+    username_elem = driver.find_element(By.NAME, 'username')
     username_elem.clear()
     username_elem.send_keys(username)
 
-    password_elem = driver.find_element(By.ID, "password")
+    password_elem = driver.find_element(By.NAME, "password")
     password_elem.clear()
     password_elem.send_keys(password)
     password_elem.send_keys(Keys.ENTER)
@@ -116,15 +116,25 @@ def mainSender(operator):
         print("wrong value operator")
 
 
-def parallelMainSender():
-    listPart = [34, 33, 31]    # TODO: add ips
-    listOfIps = []
-    for ip in listPart:
-        listOfIps.append(ip)
-        listOfIps.append(ip + 100)
+def twiceSender(aktet):
+    listOfIpsIndexed = [aktet, aktet + 100]
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        time.sleep(2)
+        executor.map(mainSender, listOfIpsIndexed)
+
+
+def parallelMainSender(listOfIps):
+    if listOfIps is None:
+        print("Please provide list of IPs")
+        return
+    listOfIpsIndexed = []
+    for ip in listOfIps:
+        listOfIpsIndexed.append(ip)
+        listOfIpsIndexed.append(ip + 100)
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
-        executor.map(mainSender, listOfIps)
+        time.sleep(2)
+        executor.map(mainSender, listOfIpsIndexed)
 
 
-parallelMainSender()
+# parallelMainSender([31])
