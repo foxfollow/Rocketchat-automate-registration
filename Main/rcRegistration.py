@@ -28,7 +28,7 @@ def getValues(isDeploy, thirdOctet):
             'myMail': "s.g.d3f0ld@gmail.com"
         }
     else:
-        if thirdOctet < 10:
+        if int(thirdOctet) < 10:
             zeroOctet = "0" + strOctet
         else:
             zeroOctet = strOctet

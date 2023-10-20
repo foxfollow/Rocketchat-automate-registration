@@ -110,6 +110,7 @@ def mainDeploySender(octet, index):
         url_server = f'http://{halfIp + str(octet)}:3000/'
         sender(url_server)
     elif index == 2:
+        time.sleep(30)  # necessarily to wait until sender() will execute first message
         url_server = f'http://{halfIp + str(octet)}:3000/'
         answer(url_server)
     else:
