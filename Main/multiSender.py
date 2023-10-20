@@ -22,7 +22,7 @@ def check_server(driver, url_server):
         try:
             driver.get(url_server)
         except Exception:
-            print("Wow, something went wrong with your rocketchat server!!!Wait for 1 min... ")
+            print(f"Sender: Wow, something went wrong with your rocketchat server!!!Wait for 1 min... server: {url_server} ")
             time.sleep(60)
         else:
             flag = True
@@ -104,37 +104,47 @@ def answer(url_server):
             textarea_elem.send_keys(Keys.ENTER)
 
 
-def mainSender(operator):
-    if operator > 100:
-        operator -= 100
-        url_server = f'http://10.10.20.{str(operator)}:3000/'  # TODO: change url
+def mainDeploySender(octet, index):
+    halfIp = '198.18.96.'
+    if index == 1:
+        url_server = f'http://{halfIp + str(octet)}:3000/'
         sender(url_server)
-    elif operator < 100:
-        url_server = f'http://10.10.20.{str(operator)}:3000/'  # TODO: change url
+    elif index == 2:
+        url_server = f'http://{halfIp + str(octet)}:3000/'
         answer(url_server)
     else:
         print("wrong value operator")
 
 
-def twiceSender(aktet):
-    listOfIpsIndexed = [aktet, aktet + 100]
+def mainTestSender(octet, index):
+    halfIp = '10.10.20.'
+    if index == 1:
+        url_server = f'http://{halfIp + str(octet)}:3000/'
+        sender(url_server)
+    elif index == 2:
+        url_server = f'http://{halfIp + str(octet)}:3000/'
+        answer(url_server)
+    else:
+        print("wrong value operator")
+
+
+def twiceSender(octet, isDeploy=True):
+    listOfOctetsIndexed = [(octet, 1), (octet, 2)]
+    if isDeploy:
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            time.sleep(1)
+            executor.map(lambda p: mainDeploySender(*p), listOfOctetsIndexed)
+    else:
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            time.sleep(1)
+            executor.map(lambda p: mainTestSender(*p), listOfOctetsIndexed)
+
+
+def parallelMainSender(listOfOctets):  # TODO: remake for testing version multi sender
+
     with concurrent.futures.ThreadPoolExecutor() as executor:
         time.sleep(2)
-        executor.map(mainSender, listOfIpsIndexed)
-
-
-def parallelMainSender(listOfIps):
-    if listOfIps is None:
-        print("Please provide list of IPs")
-        return
-    listOfIpsIndexed = []
-    for ip in listOfIps:
-        listOfIpsIndexed.append(ip)
-        listOfIpsIndexed.append(ip + 100)
-
-    with concurrent.futures.ThreadPoolExecutor() as executor:
-        time.sleep(2)
-        executor.map(mainSender, listOfIpsIndexed)
+        executor.map(twiceSender, listOfOctets)
 
 
 # parallelMainSender([31])

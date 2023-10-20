@@ -10,17 +10,36 @@ import concurrent.futures
 
 # third_aktet = socket.gethostbyname(socket.gethostname()).split('.')[2]
 # url_server = f'http://198.18.96.{third_aktet}:3000/'
-# domainIP = f'10{third_aktet}....'
 # url_server = f'http://10.10.20.{third_aktet}:3000/'
-domainIP = '10.10.20.30'
+
 domainDefault = 'rct.local'     # Do not change!
-domainDN = 'DC=rct,DC=local'    # TODO: change domain DN
-domainUser = f'CN=Administrator,CN=Users,{domainDN}'
 domainPassword = 'Admin1Admin1'
 url_server_setup = 'setup-wizard/'
 
-myMail = "s.g.d3f0ld@gmail.com"     # TODO: change mail
-# myMail = "h.training.scpc@gmail.com"
+
+def getValues(isDeploy, thirdOctet):
+    strOctet = str(thirdOctet)
+    if not isDeploy:
+        variables = {
+            'serverIP': f'10.10.20.{strOctet}',
+            'domainIP': '10.10.20.30',
+            'domainDN': 'DC=rct,DC=local',
+            'domainUser': f'CN=Administrator,CN=Users,DC=rct,DC=local',
+            'myMail': "s.g.d3f0ld@gmail.com"
+        }
+    else:
+        if thirdOctet < 10:
+            zeroOctet = "0" + strOctet
+        else:
+            zeroOctet = strOctet
+        variables = {
+            'serverIP': f'198.18.96.{strOctet}',
+            'domainIP': f'10.122.{strOctet}.113',
+            'domainDN': f'DC=spectrum,DC={zeroOctet},DC=power,DC=cc23',
+            'domainUser': f'CN=Administrator,CN=Users,DC=spectrum,DC={zeroOctet},DC=power,DC=cc23',
+            'myMail': "h.training.scpc@gmail.com"
+        }
+    return variables
 
 
 def check_server(driver, url):
@@ -136,20 +155,21 @@ def closeWindow(driver, recurse=False):
             closeWindow(driver, recurse=True)
 
 
-def registration(driver, url_server):
+def registration(driver, url_server, isDeploy, thirdOctet):
+    variables = getValues(isDeploy, thirdOctet)
     """Step 1, registration."""
     if driver.current_url == url_server + url_server_setup + "1":
         doSendKeys(driver, By.NAME, 'fullname', 'chat-admin')
 
         doSendKeys(driver, By.NAME, 'username', 'chat-admin')
 
-        doSendKeys(driver, By.NAME, 'email', myMail)
+        doSendKeys(driver, By.NAME, 'email', variables['myMail'])
 
         password_elem = doSendKeys(driver, By.NAME, 'password', 'P@ssw0rd')
         password_elem.send_keys(Keys.ENTER)
         # tmpLogin(driver, "chat-admin", "P@ssw0rd")
         # Wait for the page to load
-        time.sleep(5)  # TODO: change to 5
+        time.sleep(5)
 
     """Step 2, registration. Organization Info"""
     if driver.current_url == url_server + url_server_setup + "2":
@@ -165,12 +185,12 @@ def registration(driver, url_server):
         button = driver.find_element(By.XPATH, "//button[normalize-space()='Next']")    # for RC v6.4.2
         button.click()
         # Wait for the page to load
-        time.sleep(5)   # TODO: change to 5
+        time.sleep(5)
 
     """Step 3, registration. Enter cloud email"""
     if driver.current_url == url_server + url_server_setup + "3":
 
-        doSendKeys(driver, By.NAME, 'email', myMail)
+        doSendKeys(driver, By.NAME, 'email', variables['myMail'])
 
         checkBox(driver, "updates")
         checkBox(driver, "agreement")
@@ -202,14 +222,15 @@ def settings(driver):
     time.sleep(2)
 
 
-def ldap(driver, url_server):
+def ldap(driver, url_server, isDeploy, thirdOctet):
+    variables = getValues(isDeploy, thirdOctet)
     driver.get(f'{url_server}admin/settings/LDAP')
     time.sleep(3)
     closeWindow(driver)
     time.sleep(1)
     swipeButton(driver, 'LDAP_Enable', 'Enable')
     time.sleep(1)
-    doSendKeys(driver, By.ID, "LDAP_Host", domainIP)
+    doSendKeys(driver, By.ID, "LDAP_Host", variables['domainIP'])
 
     swipeButton(driver, "LDAP_Reconnect", "Reconnect")
     swipeButton(driver, "LDAP_Login_Fallback", "Login Fallback")
@@ -217,7 +238,7 @@ def ldap(driver, url_server):
     openBar(driver, 'Authentication')
     swipeButton(driver, 'LDAP_Authentication', 'Enable')
     time.sleep(1)
-    doSendKeys(driver, By.ID, 'LDAP_Authentication_UserDN', domainUser)
+    doSendKeys(driver, By.ID, 'LDAP_Authentication_UserDN', variables['domainUser'])
     time.sleep(1)
     doSendKeys(driver, By.ID, 'LDAP_Authentication_Password', domainPassword)
     time.sleep(1)
@@ -230,7 +251,7 @@ def ldap(driver, url_server):
     # time.sleep(1)
     openBar(driver, "Search Filter")
     time.sleep(1)
-    doSendKeys(driver, By.ID, 'LDAP_BaseDN', domainDN)
+    doSendKeys(driver, By.ID, 'LDAP_BaseDN', variables['domainDN'])
     time.sleep(1)
 
     """Changing tab to Data Sync"""
@@ -247,39 +268,40 @@ def ldap(driver, url_server):
     time.sleep(1)   # Before save
 
 
-def mainRegistration(third_aktet):
-    url_server = f'http://10.10.20.{str(third_aktet)}:3000/'     # TODO: change url
+def mainRegistration(thirdOctet, isDeploy=True):
+    variables = getValues(isDeploy, thirdOctet)
+    urlServer = f'http://{variables["serverIP"]}:3000/'
     """CREATE DRIVER"""
     options = webdriver.FirefoxOptions()
     options.add_argument("--mute-audio")
     driver = webdriver.Firefox(options=options)
 
-    check_server(driver, url_server + url_server_setup + "1")
+    check_server(driver, urlServer + url_server_setup + "1")
     time.sleep(5)  # necessary pause!!
 
-    # check if server is registered already TODO: uncomment
-    if driver.current_url == url_server + "home":
+    # check if server is registered already
+    if driver.current_url == urlServer + "home":
         tmpLogin(driver, "chat-admin", "P@ssw0rd")
         time.sleep(2)
         # closeWindow(driver)
-        driver.get(url_server + url_server_setup + '1')
+        driver.get(urlServer + url_server_setup + '1')
         time.sleep(2)
-        if driver.current_url == url_server + "home":
+        if driver.current_url == urlServer + "home":
             driver.close()
-            print(f"already registered on {url_server}")
+            print(f"already registered on {urlServer}")
             return
 
     # run registration only if "setup-wizard" in url
     if url_server_setup in driver.current_url:
-        registration(driver, url_server)
+        registration(driver, urlServer, isDeploy, thirdOctet)
         # tmpLogin(driver, "chat-admin", "P@ssw0rd")  # only for test
-        checkUrlAndNavigate(driver, url_server)
+        checkUrlAndNavigate(driver, urlServer)
         settings(driver)
-        ldap(driver, url_server)
-        print(f"End script success for server {url_server}")
+        ldap(driver, urlServer, isDeploy, thirdOctet)
+        print(f"End script success for server {urlServer}")
     time.sleep(5)
     driver.close()
-    print(f"closed registration session on {url_server}")
+    print(f"closed registration session on {urlServer}")
 
 
 def parallelMainRegistration(listOfIps):
