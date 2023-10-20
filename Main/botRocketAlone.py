@@ -2,9 +2,10 @@
 import rcRegistration
 import multiSender
 import socket
+import sys
 
 thirdOctet = socket.gethostbyname(socket.gethostname()).split('.')[2]
-# third_aktet = 33
+# thirdOctet = sys.argv[1]
 
 rcRegistration.mainRegistration(thirdOctet, isDeploy=True)
 print("Starting twiceSender")
