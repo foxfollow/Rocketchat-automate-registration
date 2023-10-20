@@ -4,11 +4,15 @@
 
 # Import the sys module
 import sys
-import time
+import socket
 import subprocess
 import time
 
-ip = "10.10.20.32"
+s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+s.connect(("8.8.8.8", 80))
+ip = s.getsockname()[0]
+
+# ip = "10.10.20.32"
 while True:
     # Check the status of the service
     result = subprocess.run(["sudo", "service", "snap.rocketchat-server.rocketchat-server", "status"],
