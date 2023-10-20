@@ -3,7 +3,12 @@
 ![Current](https://img.shields.io/badge/Python-3.10-blue)
 
 ## Description
-the project is in work
+The project is in dev
+
+## Versions
+This script have been tested on:
+Python 3.10 and 3.11
+Rocketchat 6.4.2
 
 ## License
 

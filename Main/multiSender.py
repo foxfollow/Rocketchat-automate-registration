@@ -22,7 +22,7 @@ def check_server(driver, url_server):
         try:
             driver.get(url_server)
         except Exception:
-            print("Wow, something went wrong with your rocketchat server!!!Wait for 1 min... ")
+            print(f"Sender: Wow, something went wrong with your rocketchat server!!!Wait for 1 min... server: {url_server} ")
             time.sleep(60)
         else:
             flag = True
@@ -30,11 +30,11 @@ def check_server(driver, url_server):
 
 def login(driver, username, password):
     """Function to handle the login process."""
-    username_elem = driver.find_element(By.ID, 'username')
+    username_elem = driver.find_element(By.NAME, 'username')
     username_elem.clear()
     username_elem.send_keys(username)
 
-    password_elem = driver.find_element(By.ID, "password")
+    password_elem = driver.find_element(By.NAME, "password")
     password_elem.clear()
     password_elem.send_keys(password)
     password_elem.send_keys(Keys.ENTER)
@@ -104,27 +104,47 @@ def answer(url_server):
             textarea_elem.send_keys(Keys.ENTER)
 
 
-def mainSender(operator):
-    if operator > 100:
-        operator -= 100
-        url_server = f'http://10.10.20.{str(operator)}:3000/'  # TODO: change url
+def mainDeploySender(octet, index):
+    halfIp = '198.18.96.'
+    if index == 1:
+        url_server = f'http://{halfIp + str(octet)}:3000/'
         sender(url_server)
-    elif operator < 100:
-        url_server = f'http://10.10.20.{str(operator)}:3000/'  # TODO: change url
+    elif index == 2:
+        url_server = f'http://{halfIp + str(octet)}:3000/'
         answer(url_server)
     else:
         print("wrong value operator")
 
 
-def parallelMainSender():
-    listPart = [34, 33, 31]    # TODO: add ips
-    listOfIps = []
-    for ip in listPart:
-        listOfIps.append(ip)
-        listOfIps.append(ip + 100)
+def mainTestSender(octet, index):
+    halfIp = '10.10.20.'
+    if index == 1:
+        url_server = f'http://{halfIp + str(octet)}:3000/'
+        sender(url_server)
+    elif index == 2:
+        url_server = f'http://{halfIp + str(octet)}:3000/'
+        answer(url_server)
+    else:
+        print("wrong value operator")
+
+
+def twiceSender(octet, isDeploy=True):
+    listOfOctetsIndexed = [(octet, 1), (octet, 2)]
+    if isDeploy:
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            time.sleep(1)
+            executor.map(lambda p: mainDeploySender(*p), listOfOctetsIndexed)
+    else:
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            time.sleep(1)
+            executor.map(lambda p: mainTestSender(*p), listOfOctetsIndexed)
+
+
+def parallelMainSender(listOfOctets):  # TODO: remake for testing version multi sender
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
-        executor.map(mainSender, listOfIps)
+        time.sleep(2)
+        executor.map(twiceSender, listOfOctets)
 
 
-parallelMainSender()
+# parallelMainSender([31])
