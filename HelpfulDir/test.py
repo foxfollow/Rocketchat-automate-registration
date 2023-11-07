@@ -1,6 +1,8 @@
 # C:\Users\h_savoiskyi\AppData\Roaming\Python\Python310\Scripts\pyinstaller.exe
 # $env:Path += ";C:\\Users\\h_savoiskyi\\AppData\\Roaming\\Python\\Python310\\Scripts"
-# pyinstaller .\botRocketAlone.py --onefile --hidden-import selenium --icon=icon.ico
+
+# pyinstaller .\botRocketAlone.py --onefile --hidden-import selenium --hidden-import rcRegistration
+# --hidden-import multiSender  --icon=icon.ico
 
 # cat << EOF |sudo tee -a ./ip.py
 import sys

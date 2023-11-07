@@ -23,7 +23,7 @@ def logToFile(message: str, scriptName='rcRegistration.py'):
     dateTimeStr = date.strftime('%Y-%m-%d_%H-%M-%S')
     with open(f'C:\Temp\LOGS_Debugger_Scripts_{dateStr}.log', 'a') as f:
         f.write(f'{dateTimeStr}: IN {scriptName} LOGS: {message}\n')
-    logToFile(f'{dateTimeStr}: {message}\n')
+    print(f'{dateTimeStr}: {message}\n')
 
 
 def getValues(isDeploy, thirdOctet):
@@ -73,7 +73,7 @@ def checkUrlAndNavigate(driver, url_server):
             logToFile(f"In setup. Waiting for 30 seconds...(server: {url_server}")
             time.sleep(30)
         else:
-            logToFile(f"Not in setup. Going to settings for server {url_server}")
+            logToFile(f"Not in setup(registration mail achived). Going to settings for server {url_server}")
             driver.get(f'{url_server}admin/settings/Accounts')
             break
 
@@ -160,7 +160,7 @@ def closeWindow(driver, recurse=False):
         icon.click()
 
     except:
-        logToFile(f"Button not found. for {driver.current_url}")
+        logToFile(f"OK: Button not found for popup window. for {driver.current_url}")
         if not recurse:
             closeWindow(driver, recurse=True)
 

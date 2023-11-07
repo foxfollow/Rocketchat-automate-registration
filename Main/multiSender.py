@@ -23,7 +23,7 @@ def logToFile(message: str, scriptName='multiSender.py'):
     dateTimeStr = date.strftime('%Y-%m-%d_%H-%M-%S')
     with open(f'C:\Temp\LOGS_Debugger_Scripts_{dateStr}.log', 'a') as f:
         f.write(f'{dateTimeStr}: IN - {scriptName} LOGS: {message}\n')
-    logToFile(f'{dateTimeStr}: {message}\n')
+    print(f'{dateTimeStr}: {message}\n')
 
 
 def check_server(driver, url_server):
@@ -85,6 +85,7 @@ def sender(url_server):
         textarea_elem = driver.find_element(By.NAME, 'msg')
         textarea_elem.send_keys("Connection check, are you connected ?")
         textarea_elem.send_keys(Keys.ENTER)
+        logToFile("Sent: <Connection check...> waiting for 1 min")
         time.sleep(60)
 
 
@@ -112,6 +113,7 @@ def answer(url_server):
         if message.text == "Connection check, are you connected ?":
             textarea_elem.send_keys("Yes, I'm here")
             textarea_elem.send_keys(Keys.ENTER)
+            logToFile("Sent: <Yes, I'm here>")
 
 
 def mainDeploySender(octet, index):
