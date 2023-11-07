@@ -6,6 +6,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 # from selenium.webdriver.chrome.service import Service
 import time
+import datetime
 # import socket
 import concurrent.futures
 
@@ -16,13 +17,22 @@ username1 = "operator1"
 username2 = "operator2"
 
 
+def logToFile(message: str, scriptName='multiSender.py'):
+    date = datetime.datetime.now()
+    dateStr = date.strftime('%Y-%m-%d')
+    dateTimeStr = date.strftime('%Y-%m-%d_%H-%M-%S')
+    with open(f'C:\Temp\LOGS_Debugger_Scripts_{dateStr}.log', 'a') as f:
+        f.write(f'{dateTimeStr}: IN - {scriptName} LOGS: {message}\n')
+    print(f'{dateTimeStr}: {message}\n')
+
+
 def check_server(driver, url_server):
     flag = False
     while not flag:
         try:
             driver.get(url_server)
         except Exception:
-            print(f"Sender: Wow, something went wrong with your rocketchat server!!!Wait for 1 min... server: {url_server} ")
+            logToFile(f"Sender: Wow, something went wrong with your rocketchat server!!!Wait for 1 min... server: {url_server} ")
             time.sleep(60)
         else:
             flag = True
@@ -75,6 +85,7 @@ def sender(url_server):
         textarea_elem = driver.find_element(By.NAME, 'msg')
         textarea_elem.send_keys("Connection check, are you connected ?")
         textarea_elem.send_keys(Keys.ENTER)
+        logToFile("Sent: <Connection check...> waiting for 1 min")
         time.sleep(60)
 
 
@@ -102,6 +113,7 @@ def answer(url_server):
         if message.text == "Connection check, are you connected ?":
             textarea_elem.send_keys("Yes, I'm here")
             textarea_elem.send_keys(Keys.ENTER)
+            logToFile("Sent: <Yes, I'm here>")
 
 
 def mainDeploySender(octet, index):
@@ -114,7 +126,7 @@ def mainDeploySender(octet, index):
         url_server = f'http://{halfIp + str(octet)}:3000/'
         answer(url_server)
     else:
-        print("wrong value operator")
+        logToFile("wrong value operator")
 
 
 def mainTestSender(octet, index):
@@ -127,7 +139,7 @@ def mainTestSender(octet, index):
         url_server = f'http://{halfIp + str(octet)}:3000/'
         answer(url_server)
     else:
-        print("wrong value operator")
+        logToFile("wrong value operator")
 
 
 def twiceSender(octet, isDeploy=True):
