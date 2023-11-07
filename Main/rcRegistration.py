@@ -5,16 +5,25 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
 import time
-# import socket
+import datetime
 import concurrent.futures
 
 # third_aktet = socket.gethostbyname(socket.gethostname()).split('.')[2]
 # url_server = f'http://198.18.96.{third_aktet}:3000/'
 # url_server = f'http://10.10.20.{third_aktet}:3000/'
 
-domainDefault = 'rct.local'     # Do not change!
-domainPassword = 'Admin1Admin1'
+domainDefault = 'rct.local'  # Do not change!
+domainPassword = 'SCP.Admin1'
 url_server_setup = 'setup-wizard/'
+
+
+def logToFile(message: str, scriptName='rcRegistration.py'):
+    date = datetime.datetime.now()
+    dateStr = date.strftime('%Y-%m-%d')
+    dateTimeStr = date.strftime('%Y-%m-%d_%H-%M-%S')
+    with open(f'C:\Temp\LOGS_Debugger_Scripts_{dateStr}.log', 'a') as f:
+        f.write(f'{dateTimeStr}: IN {scriptName} LOGS: {message}\n')
+    logToFile(f'{dateTimeStr}: {message}\n')
 
 
 def getValues(isDeploy, thirdOctet):
@@ -36,7 +45,7 @@ def getValues(isDeploy, thirdOctet):
             'serverIP': f'198.18.96.{strOctet}',
             'domainIP': f'10.122.{strOctet}.113',
             'domainDN': f'DC=spectrum,DC={zeroOctet},DC=power,DC=cc23',
-            'domainUser': f'CN=Administrator,CN=Users,DC=spectrum,DC={zeroOctet},DC=power,DC=cc23',
+            'domainUser': f'CN=SCPAdmin,CN=Users,DC=spectrum,DC={zeroOctet},DC=power,DC=cc23',
             'myMail': "h.training.scpc@gmail.com"
         }
     return variables
@@ -50,7 +59,7 @@ def check_server(driver, url):
         try:
             driver.get(url)
         except Exception:
-            print(f"Wow, something went wrong with your rocketchat server!!!Wait for 1 min... for server {url} ")
+            logToFile(f"Wow, something went wrong with your rocketchat server!!!Wait for 1 min... for server {url} ")
             time.sleep(60)
             maxTimeSec += 60
         else:
@@ -61,10 +70,10 @@ def checkUrlAndNavigate(driver, url_server):
     while True:
         current_url = driver.current_url
         if 'setup' in current_url:
-            print(f"In setup. Waiting for 30 seconds...(server: {url_server}")
+            logToFile(f"In setup. Waiting for 30 seconds...(server: {url_server}")
             time.sleep(30)
         else:
-            print(f"Not in setup. Going to settings for server {url_server}")
+            logToFile(f"Not in setup. Going to settings for server {url_server}")
             driver.get(f'{url_server}admin/settings/Accounts')
             break
 
@@ -143,14 +152,15 @@ def closeWindow(driver, recurse=False):
     try:
         time.sleep(5)
         # Find the button with the specified class
-        button = driver.find_element(By.XPATH, "//button[contains(@class, 'rcx-box rcx-box--full rcx-button--small-square rcx-button--square rcx-button--icon rcx-button rcx-css-trljwa rcx-css-lma364')]")
+        button = driver.find_element(By.XPATH,
+                                     "//button[contains(@class, 'rcx-box rcx-box--full rcx-button--small-square rcx-button--square rcx-button--icon rcx-button rcx-css-trljwa rcx-css-lma364')]")
 
         # Find the <i> element within the button and click it
         icon = button.find_element(By.XPATH, ".//i")
         icon.click()
 
     except:
-        print(f"Button not found. for {driver.current_url}")
+        logToFile(f"Button not found. for {driver.current_url}")
         if not recurse:
             closeWindow(driver, recurse=True)
 
@@ -182,28 +192,27 @@ def registration(driver, url_server, isDeploy, thirdOctet):
 
         time.sleep(1)
         # button = driver.find_element(By.XPATH, '//button[@type="submit" and text()="Next"]')  # for RC v6.3.7
-        button = driver.find_element(By.XPATH, "//button[normalize-space()='Next']")    # for RC v6.4.2
+        button = driver.find_element(By.XPATH, "//button[normalize-space()='Next']")  # for RC v6.4.2
         button.click()
         # Wait for the page to load
         time.sleep(5)
 
     """Step 3, registration. Enter cloud email"""
     if driver.current_url == url_server + url_server_setup + "3":
-
         doSendKeys(driver, By.NAME, 'email', variables['myMail'])
 
         checkBox(driver, "updates")
         checkBox(driver, "agreement")
         time.sleep(2)
         # button = driver.find_element(By.XPATH, '//button[@type="submit"]')
-        button = driver.find_element(By.XPATH, "//button[normalize-space()='Register']")    # for RC v6.4.2
+        button = driver.find_element(By.XPATH, "//button[normalize-space()='Register']")  # for RC v6.4.2
         button.click()  # click the button
         time.sleep(5)
 
     """Step 4, registration. Waiting email confirm"""
-    print(f"Waiting for letter accept for server {url_server}")
+    logToFile(f"Waiting for letter accept for server {url_server}")
     checkUrlAndNavigate(driver, url_server)
-    time.sleep(1)   # Before save
+    time.sleep(1)  # Before save
 
 
 def settings(driver):
@@ -262,10 +271,10 @@ def ldap(driver, url_server, isDeploy, thirdOctet):
     time.sleep(1)
     doSendKeys(driver, By.ID, 'LDAP_Default_Domain', domainDefault)
 
-    time.sleep(1)   # Before save
+    time.sleep(1)  # Before save
     button = driver.find_element(By.XPATH, "//button[normalize-space()='Save changes']")  # for RC v6.4.2
     button.click()
-    time.sleep(1)   # Before save
+    time.sleep(1)  # Before save
 
 
 def mainRegistration(thirdOctet, isDeploy=True):
@@ -288,7 +297,7 @@ def mainRegistration(thirdOctet, isDeploy=True):
         time.sleep(2)
         if driver.current_url == urlServer + "home":
             driver.close()
-            print(f"already registered on {urlServer}")
+            logToFile(f"already registered on {urlServer}")
             return
 
     # run registration only if "setup-wizard" in url
@@ -298,19 +307,18 @@ def mainRegistration(thirdOctet, isDeploy=True):
         checkUrlAndNavigate(driver, urlServer)
         settings(driver)
         ldap(driver, urlServer, isDeploy, thirdOctet)
-        print(f"End script success for server {urlServer}")
+        logToFile(f"End script success for server {urlServer}")
     time.sleep(5)
     driver.close()
-    print(f"closed registration session on {urlServer}")
+    logToFile(f"closed registration session on {urlServer}")
 
 
 def parallelMainRegistration(listOfIps):
     if listOfIps is None:
-        print("Please provide list of IPs")
+        logToFile("Please provide list of IPs")
         return
     with concurrent.futures.ThreadPoolExecutor() as executor:
         time.sleep(2)
         executor.map(mainRegistration, listOfIps)
-
 
 # parallelMainRegistration([33])

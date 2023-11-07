@@ -3,3 +3,5 @@ build
 HelpfulDir/build
 Main/build
 *.spec
+HelpfulDir/BotHendler/tokenBot.py
+*.log

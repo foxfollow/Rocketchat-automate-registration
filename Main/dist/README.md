@@ -1,0 +1,3 @@
+- *Deploy means the last stable version compiled for deployment
+- *Tester means version for local testing of developer
+- *_v000 means version 0.0.0
