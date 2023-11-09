@@ -9,6 +9,7 @@ import time
 import datetime
 # import socket
 import concurrent.futures
+from rcRegistration import check_server
 
 # third_aktet = socket.gethostbyname(socket.gethostname()).split('.')[2]
 # url_server = f'http://198.18.96.{third_aktet}:3000/'
@@ -26,16 +27,16 @@ def logToFile(message: str, scriptName='multiSender.py'):
     print(f'{dateTimeStr}: {message}\n')
 
 
-def check_server(driver, url_server):
-    flag = False
-    while not flag:
-        try:
-            driver.get(url_server)
-        except Exception:
-            logToFile(f"Sender: Wow, something went wrong with your rocketchat server!!!Wait for 1 min... server: {url_server} ")
-            time.sleep(60)
-        else:
-            flag = True
+# def check_server(driver, url_server):
+#     flag = False
+#     while not flag:
+#         try:
+#             driver.get(url_server)
+#         except Exception:
+#             logToFile(f"Sender: Wow, something went wrong with your rocketchat server!!!Wait for 1 min... server: {url_server} ")
+#             time.sleep(60)
+#         else:
+#             flag = True
 
 
 def login(driver, username, password):
@@ -68,7 +69,7 @@ def sender(url_server):
     options = webdriver.FirefoxOptions()
     options.add_argument("--mute-audio")
     driver = webdriver.Firefox(options=options)  # webdriver.Chrome(service=Service(PATH), options=options)
-    check_server(driver, url_server)
+    check_server(driver, url_server, options, scriptName="multiSender.py")
     time.sleep(5)   # necessary pause!!
     """LOGIN"""
     if not login(driver, f"{username1}@rct.local", "Admin1Admin1"):
@@ -94,7 +95,7 @@ def answer(url_server):
     options = webdriver.FirefoxOptions()
     options.add_argument("--mute-audio")
     driver = webdriver.Firefox(options=options)  # webdriver.Chrome(service=Service(PATH), options=options)
-    check_server(driver, url_server)
+    check_server(driver, url_server, options, scriptName="multiSender.py")
     time.sleep(5)  # necessary pause!!
     """LOGIN"""
     if not login(driver, f"{username2}@rct.local", "Admin1Admin1"):

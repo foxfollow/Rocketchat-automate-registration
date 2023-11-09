@@ -1,10 +1,12 @@
 .idea
 .vscode
 .pytest_cache
+__pycache__
 build
 HelpfulDir/build
 Main/build
 *.spec
 HelpfulDir/BotHendler/tokenBot.py
 *.log
+*.png
 .DS_Store

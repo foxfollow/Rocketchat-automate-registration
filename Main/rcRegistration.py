@@ -6,13 +6,13 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.firefox.webdriver import WebDriver
 from selenium.webdriver.common.by import By
+import requests
 import time
 import datetime
 import concurrent.futures
+import sshRocketCfg
 
 # third_aktet = socket.gethostbyname(socket.gethostname()).split('.')[2]
-# url_server = f'http://198.18.96.{third_aktet}:3000/'
-# url_server = f'http://10.10.20.{third_aktet}:3000/'
 
 domainDefault = 'rct.local'  # Do not change!
 domainPassword = 'SCP.Admin1'
@@ -53,30 +53,43 @@ def getValues(isDeploy, thirdOctet):
     return variables
 
 
-def is_page_empty(driver: WebDriver) -> bool:
+def is_page_empty(driver: WebDriver, ip) -> bool:
+    time.sleep(5)
     body = driver.find_element(By.TAG_NAME, 'body')
-    return not bool(body.text.strip())
+    if 'js-focus-visible' in body.get_attribute('innerHTML'):
+        return False
+    elif not bool(body.text.strip()):
+        sshRocketCfg.ssh_connection(ip, "root", "Admin1Admin1")
+        logToFile(f"Connection to {ip} for changing rocketchat config")
 
 
-def check_server(driver, url):
+def check_server(driver, url, options, ip="", scriptName="rcRegistration.py"):
     flag = False
-    maxTimeSec = 0
+    # maxTimeSec = 0    # max time of waiting
     while not flag:
         try:
+            response = requests.get(url)
+            if response.status_code != 200:
+                raise Exception(f"HTTP status code {response.status_code}")
             driver.get(url)
-            if is_page_empty(driver):
-                logToFile(f"Page at {url} is empty. Closing browser and waiting for 2 minutes.")
-                driver.quit()
-                time.sleep(120)
-                maxTimeSec += 120
+            if is_page_empty(driver, ip):
+                logToFile(f"Page at {url} is empty. Closing browser and waiting for 2 minutes.",
+                          scriptName=scriptName)
+                driver.quit() # TODO: Not working properly (closing always)
+                time.sleep(120) # TODO: execute py script to the server
+                # maxTimeSec += 120
+                driver = webdriver.Firefox(options=options)
                 continue
-        except Exception:
-            logToFile(f"Wow, something went wrong with your rocketchat server!!!Wait for 1 min... for server {url} ")
+        except Exception as e:
+            logToFile(f"Wow, something went wrong with your rocketchat server!!!Wait for 1 min... for server {url}. Error: {e}", 
+                      scriptName=scriptName)
             time.sleep(60)
-            maxTimeSec += 60
+            # maxTimeSec += 60
         else:
             flag = True
             logToFile(f"Server {url} is up")
+
+    return driver
 
 
 def checkUrlAndNavigate(driver, url_server):
@@ -292,13 +305,14 @@ def ldap(driver, url_server, isDeploy, thirdOctet):
 
 def mainRegistration(thirdOctet, isDeploy=True):
     variables = getValues(isDeploy, thirdOctet)
-    urlServer = f'http://{variables["serverIP"]}:3000/'
+    ip = variables["serverIP"]
+    urlServer = f'http://{ip}:3000/'
     """CREATE DRIVER"""
     options = webdriver.FirefoxOptions()
     options.add_argument("--mute-audio")
     driver = webdriver.Firefox(options=options)
 
-    check_server(driver, urlServer + url_server_setup + "1")
+    driver = check_server(driver, urlServer + url_server_setup + "1", options, ip=ip)
     time.sleep(5)  # necessary pause!!
 
     # check if server is registered already
