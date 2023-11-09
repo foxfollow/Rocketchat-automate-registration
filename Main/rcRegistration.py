@@ -4,6 +4,8 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.firefox.webdriver import WebDriver
+from selenium.webdriver.common.by import By
 import time
 import datetime
 import concurrent.futures
@@ -51,19 +53,30 @@ def getValues(isDeploy, thirdOctet):
     return variables
 
 
+def is_page_empty(driver: WebDriver) -> bool:
+    body = driver.find_element(By.TAG_NAME, 'body')
+    return not bool(body.text.strip())
+
+
 def check_server(driver, url):
     flag = False
     maxTimeSec = 0
-    # while not flag and maxTimeSec < 10800:    # if we want max time 3 hours
     while not flag:
         try:
             driver.get(url)
+            if is_page_empty(driver):
+                logToFile(f"Page at {url} is empty. Closing browser and waiting for 2 minutes.")
+                driver.quit()
+                time.sleep(120)
+                maxTimeSec += 120
+                continue
         except Exception:
             logToFile(f"Wow, something went wrong with your rocketchat server!!!Wait for 1 min... for server {url} ")
             time.sleep(60)
             maxTimeSec += 60
         else:
             flag = True
+            logToFile(f"Server {url} is up")
 
 
 def checkUrlAndNavigate(driver, url_server):
