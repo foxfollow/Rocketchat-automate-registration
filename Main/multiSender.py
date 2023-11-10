@@ -59,6 +59,7 @@ def login(driver, username, password):
         if "User not found or incorrect password" in error_message:
             return False
     except Exception:
+        # logToFile(f"Login failed for user: {username}")
         pass
 
     return True

@@ -53,14 +53,12 @@ def getValues(isDeploy, thirdOctet):
     return variables
 
 
-def is_page_empty(driver: WebDriver, ip) -> bool:
+def is_page_empty(driver: WebDriver) -> bool:
     time.sleep(5)
     body = driver.find_element(By.TAG_NAME, 'body')
     if 'js-focus-visible' in body.get_attribute('innerHTML'):
         return False
-    elif not bool(body.text.strip()):
-        sshRocketCfg.ssh_connection(ip, "root", "Admin1Admin1")
-        logToFile(f"Connection to {ip} for changing rocketchat config")
+    return not bool(body.text.strip())
 
 
 def check_server(driver, url, options, ip="", scriptName="rcRegistration.py"):
@@ -70,18 +68,24 @@ def check_server(driver, url, options, ip="", scriptName="rcRegistration.py"):
         try:
             response = requests.get(url)
             if response.status_code != 200:
+                # logToFile(f'Server is down, http code: {response.status_code}')
                 raise Exception(f"HTTP status code {response.status_code}")
             driver.get(url)
-            if is_page_empty(driver, ip):
+            if is_page_empty(driver):
                 logToFile(f"Page at {url} is empty. Closing browser and waiting for 2 minutes.",
                           scriptName=scriptName)
-                driver.quit() # TODO: Not working properly (closing always)
-                time.sleep(120) # TODO: execute py script to the server
+                driver.quit() 
+
+                sshRocketCfg.ssh_connection(ip, "root", "Admin1Admin1")
+                logToFile(f"Connection to {ip} for changing rocketchat config")
+
+                time.sleep(120)
                 # maxTimeSec += 120
                 driver = webdriver.Firefox(options=options)
                 continue
+
         except Exception as e:
-            logToFile(f"Wow, something went wrong with your rocketchat server!!!Wait for 1 min... for server {url}. Error: {e}", 
+            logToFile(f"Wow, something went wrong, wait for 1 min... for server {url}. Error: {e}", 
                       scriptName=scriptName)
             time.sleep(60)
             # maxTimeSec += 60
