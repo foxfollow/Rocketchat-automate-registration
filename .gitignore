@@ -10,3 +10,4 @@ HelpfulDir/BotHendler/tokenBot.py
 *.log
 *.png
 .DS_Store
+testingQuestions.md
