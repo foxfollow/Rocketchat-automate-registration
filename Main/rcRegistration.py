@@ -109,7 +109,7 @@ def checkUrlAndNavigate(driver, url_server):
 
 
 def doSendKeys(driver, byWhat, ID, keys):
-    time.sleep(0.5)
+    time.sleep(1)
     some_elem = driver.find_element(byWhat, ID)
     some_elem.clear()
     some_elem.send_keys(keys)
@@ -142,14 +142,16 @@ def checkBox(driver, checkBoxName):
     #
     # # use JavaScript to click on the checkbox
     # driver.execute_script("arguments[0].click();", checkbox)
+    time.sleep(1)
     checkbox = driver.find_element(By.NAME, checkBoxName)
-
+    time.sleep(1)
     # create an ActionChains instance
     actions = ActionChains(driver)
+    time.sleep(1)
 
     # move to the checkbox element, then move a bit to the right and down, and click
     actions.move_to_element(checkbox).move_by_offset(2, 2).click().perform()
-
+    time.sleep(1)
 
 def openBar(driver, title):
     div = driver.find_element(By.XPATH,
@@ -230,8 +232,10 @@ def registration(driver, url_server, isDeploy, thirdOctet):
     """Step 3, registration. Enter cloud email"""
     if driver.current_url == url_server + url_server_setup + "3":
         doSendKeys(driver, By.NAME, 'email', variables['myMail'])
-
+        
+        time.sleep(1)
         checkBox(driver, "updates")
+        time.sleep(1)
         checkBox(driver, "agreement")
         time.sleep(4)
         # button = driver.find_element(By.XPATH, '//button[@type="submit"]')
