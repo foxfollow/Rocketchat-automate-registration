@@ -43,7 +43,7 @@ def autoChangeIpRocketChat(isForDeploy=True):
             time.sleep(9)
 
 
-autoChangeIpRocketChat(isForDeploy=True)
+# autoChangeIpRocketChat(isForDeploy=True)
 
 # EOF
 #
@@ -57,3 +57,33 @@ autoChangeIpRocketChat(isForDeploy=True)
 # print(input_text)
 #
 # time.sleep(5)
+
+# ##############
+
+ips = """2
+4
+5
+6
+7
+9
+10
+12
+14
+16
+17
+18
+19
+24
+26
+27
+29
+31
+32
+34
+35
+36
+39
+40
+"""
+for ip in ips.splitlines():
+    print(f"10.122.{ip}.113;")

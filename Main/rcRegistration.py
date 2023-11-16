@@ -15,7 +15,7 @@ import sshRocketCfg
 # third_aktet = socket.gethostbyname(socket.gethostname()).split('.')[2]
 
 domainDefault = 'rct.local'  # Do not change!
-domainPassword = 'SCP.Admin1'
+domainPassword = 'SPC.Admin1'
 url_server_setup = 'setup-wizard/'
 
 
@@ -47,20 +47,18 @@ def getValues(isDeploy, thirdOctet):
             'serverIP': f'198.18.96.{strOctet}',
             'domainIP': f'10.122.{strOctet}.113',
             'domainDN': f'DC=spectrum,DC={zeroOctet},DC=power,DC=cc23',
-            'domainUser': f'CN=SCPAdmin,CN=Users,DC=spectrum,DC={zeroOctet},DC=power,DC=cc23',
+            'domainUser': f'CN=SPCAdmin,CN=Users,DC=spectrum,DC={zeroOctet},DC=power,DC=cc23',
             'myMail': "h.training.scpc@gmail.com"
         }
     return variables
 
 
-def is_page_empty(driver: WebDriver, ip) -> bool:
+def is_page_empty(driver: WebDriver) -> bool:
     time.sleep(5)
     body = driver.find_element(By.TAG_NAME, 'body')
     if 'js-focus-visible' in body.get_attribute('innerHTML'):
         return False
-    elif not bool(body.text.strip()):
-        sshRocketCfg.ssh_connection(ip, "root", "Admin1Admin1")
-        logToFile(f"Connection to {ip} for changing rocketchat config")
+    return not bool(body.text.strip())
 
 
 def check_server(driver, url, options, ip="", scriptName="rcRegistration.py"):
@@ -70,18 +68,24 @@ def check_server(driver, url, options, ip="", scriptName="rcRegistration.py"):
         try:
             response = requests.get(url)
             if response.status_code != 200:
+                # logToFile(f'Server is down, http code: {response.status_code}')
                 raise Exception(f"HTTP status code {response.status_code}")
             driver.get(url)
-            if is_page_empty(driver, ip):
+            if is_page_empty(driver):
                 logToFile(f"Page at {url} is empty. Closing browser and waiting for 2 minutes.",
                           scriptName=scriptName)
-                driver.quit() # TODO: Not working properly (closing always)
-                time.sleep(120) # TODO: execute py script to the server
+                driver.quit() 
+
+                sshRocketCfg.ssh_connection(ip, "root", "Admin1Admin1")
+                logToFile(f"Connection to {ip} for changing rocketchat config")
+
+                time.sleep(120)
                 # maxTimeSec += 120
                 driver = webdriver.Firefox(options=options)
                 continue
+
         except Exception as e:
-            logToFile(f"Wow, something went wrong with your rocketchat server!!!Wait for 1 min... for server {url}. Error: {e}", 
+            logToFile(f"Wow, something went wrong, wait for 1 min... for server {url}. Error: {e}", 
                       scriptName=scriptName)
             time.sleep(60)
             # maxTimeSec += 60
@@ -105,7 +109,7 @@ def checkUrlAndNavigate(driver, url_server):
 
 
 def doSendKeys(driver, byWhat, ID, keys):
-    time.sleep(0.5)
+    time.sleep(1)
     some_elem = driver.find_element(byWhat, ID)
     some_elem.clear()
     some_elem.send_keys(keys)
@@ -130,22 +134,19 @@ def selectInSpan(driver, labelName, selectedName, isDiv=False):
 
 
 def checkBox(driver, checkBoxName):
-    # div = driver.find_element(By.XPATH, f'//div[@class="rcx-box rcx-box--full rcx-css-{rcxCss}"]')
-    # div = driver.find_element(By.XPATH, f'//div[@name="{}"]')
-    # label = driver.find_element(By.NAME, f"{checkBoxName}")
-    # find the checkbox using its name
-    # checkbox = driver.find_element(By.NAME, "agreement")
-    #
-    # # use JavaScript to click on the checkbox
-    # driver.execute_script("arguments[0].click();", checkbox)
+    time.sleep(1)
     checkbox = driver.find_element(By.NAME, checkBoxName)
-
+    time.sleep(1)
+    # scroll the element into view
+    driver.execute_script("arguments[0].scrollIntoView();", checkbox)
+    time.sleep(1)
     # create an ActionChains instance
     actions = ActionChains(driver)
+    time.sleep(1)
 
     # move to the checkbox element, then move a bit to the right and down, and click
     actions.move_to_element(checkbox).move_by_offset(2, 2).click().perform()
-
+    time.sleep(1)
 
 def openBar(driver, title):
     div = driver.find_element(By.XPATH,
@@ -226,12 +227,16 @@ def registration(driver, url_server, isDeploy, thirdOctet):
     """Step 3, registration. Enter cloud email"""
     if driver.current_url == url_server + url_server_setup + "3":
         doSendKeys(driver, By.NAME, 'email', variables['myMail'])
-
+        
+        time.sleep(1)
         checkBox(driver, "updates")
+        time.sleep(1)
         checkBox(driver, "agreement")
-        time.sleep(2)
+        time.sleep(4)
         # button = driver.find_element(By.XPATH, '//button[@type="submit"]')
         button = driver.find_element(By.XPATH, "//button[normalize-space()='Register']")  # for RC v6.4.2
+        time.sleep(2)
+
         button.click()  # click the button
         time.sleep(5)
 
@@ -313,6 +318,9 @@ def mainRegistration(thirdOctet, isDeploy=True):
     driver = webdriver.Firefox(options=options)
 
     driver = check_server(driver, urlServer + url_server_setup + "1", options, ip=ip)
+    time.sleep(5)  # necessary pause!!
+    # assuming you have a driver instance already created and assigned to the variable 'driver'
+    driver.refresh()
     time.sleep(5)  # necessary pause!!
 
     # check if server is registered already
