@@ -9,6 +9,8 @@ thirdOctet = socket.gethostbyname(socket.gethostname()).split('.')[2]     # FOR 
 # thirdOctet = "35"     # FOR TESTER
 # thirdOctet = sys.argv[1]             # FOR TESTER
 
+multiSender.logToFile("version botRocketAlone.py - 1.3.0", scriptName="botRocketAlone.py")
+
 while True:
     try:
         rcRegistration.mainRegistration(thirdOctet, isDeploy=True)
