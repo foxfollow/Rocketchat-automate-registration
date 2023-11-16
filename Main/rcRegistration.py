@@ -134,16 +134,11 @@ def selectInSpan(driver, labelName, selectedName, isDiv=False):
 
 
 def checkBox(driver, checkBoxName):
-    # div = driver.find_element(By.XPATH, f'//div[@class="rcx-box rcx-box--full rcx-css-{rcxCss}"]')
-    # div = driver.find_element(By.XPATH, f'//div[@name="{}"]')
-    # label = driver.find_element(By.NAME, f"{checkBoxName}")
-    # find the checkbox using its name
-    # checkbox = driver.find_element(By.NAME, "agreement")
-    #
-    # # use JavaScript to click on the checkbox
-    # driver.execute_script("arguments[0].click();", checkbox)
     time.sleep(1)
     checkbox = driver.find_element(By.NAME, checkBoxName)
+    time.sleep(1)
+    # scroll the element into view
+    driver.execute_script("arguments[0].scrollIntoView();", checkbox)
     time.sleep(1)
     # create an ActionChains instance
     actions = ActionChains(driver)
@@ -323,6 +318,9 @@ def mainRegistration(thirdOctet, isDeploy=True):
     driver = webdriver.Firefox(options=options)
 
     driver = check_server(driver, urlServer + url_server_setup + "1", options, ip=ip)
+    time.sleep(5)  # necessary pause!!
+    # assuming you have a driver instance already created and assigned to the variable 'driver'
+    driver.refresh()
     time.sleep(5)  # necessary pause!!
 
     # check if server is registered already
