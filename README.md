@@ -6,7 +6,7 @@
 
 ## Description
 
-Currently working version of self 1.2.2
+Currently working version of self 1.3.0
 
 Main file is in `%project%\Main` 
 - filename: `botRocketAlone.py` which is compiled with pyinstaller to .exe -> `~dist\botRocketAloneDeploy.exe`
@@ -32,11 +32,11 @@ pyinstaller .\botRocketAlone.py --onefile --hidden-import selenium --hidden-impo
 ```
 ### Anouther way is building
 in In ./Main run `build.ps1`;
-Enter the version for file name, and select `d` option for deploy
+Enter the version ex: `130` (for 1.3.0) it will be added at the end of file name, than select `d` option for deploy
 
 File will be in
 ```
-CC23\Main\dist\botRocketAloneDeploy.py
+CC23\Main\dist\botRocketAloneDeploy_v130.py
 ```
 
 ## TODO
