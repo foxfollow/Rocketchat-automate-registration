@@ -15,7 +15,7 @@ import sshRocketCfg
 # third_aktet = socket.gethostbyname(socket.gethostname()).split('.')[2]
 
 domainDefault = 'rct.local'  # Do not change!
-domainPassword = 'SCP.Admin1'
+domainPassword = 'SPC.Admin1'
 url_server_setup = 'setup-wizard/'
 
 
@@ -47,7 +47,7 @@ def getValues(isDeploy, thirdOctet):
             'serverIP': f'198.18.96.{strOctet}',
             'domainIP': f'10.122.{strOctet}.113',
             'domainDN': f'DC=spectrum,DC={zeroOctet},DC=power,DC=cc23',
-            'domainUser': f'CN=SCPAdmin,CN=Users,DC=spectrum,DC={zeroOctet},DC=power,DC=cc23',
+            'domainUser': f'CN=SPCAdmin,CN=Users,DC=spectrum,DC={zeroOctet},DC=power,DC=cc23',
             'myMail': "h.training.scpc@gmail.com"
         }
     return variables
@@ -233,9 +233,11 @@ def registration(driver, url_server, isDeploy, thirdOctet):
 
         checkBox(driver, "updates")
         checkBox(driver, "agreement")
-        time.sleep(2)
+        time.sleep(4)
         # button = driver.find_element(By.XPATH, '//button[@type="submit"]')
         button = driver.find_element(By.XPATH, "//button[normalize-space()='Register']")  # for RC v6.4.2
+        time.sleep(2)
+
         button.click()  # click the button
         time.sleep(5)
 
