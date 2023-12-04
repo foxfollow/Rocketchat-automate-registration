@@ -1,4 +1,4 @@
-# CC23 automatic web registration of rocketchat servers
+# Automatic web registration of rocketchat servers
 
 [//]: # (![Using]&#40;https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54&#41;)
 ![Current](https://img.shields.io/badge/Python-3.10-blue)
@@ -30,12 +30,14 @@ Main file is in `%project%\Main`
 
 ### Required changes
 1. Change the row in file `botRocketAlone.py` (in my env rocket chat machines have fourth octet same as third in windows machine witch running the script, but you use full ip manual changing in `rcRegistration.py` - `serverIP` or remake it for your needs)
-```
+``` python
 thirdOctet = socket.gethostbyname(socket.gethostname()).split('.')[2]     # FOR DEPLOY
 ```
 
 2. Change the row in file `rcRegistration.py`
 ```python
+# if use multiSender.py change also in it
+domainDefault = 'rct.local'  # Do not change!
 domainPassword = 'SCP.Admin1' # password for domain user to access LDAP finding users
 
 ...
@@ -56,10 +58,10 @@ def getValues(isDeploy, thirdOctet):
         else:
             zeroOctet = strOctet
         variables = {
-            'serverIP': f'198.18.96.{strOctet}',  # ip of rocket chat
-            'domainIP': f'10.122.{strOctet}.113', # ip of domain controller
-            'domainDN': f'DC=spectrum,DC={zeroOctet},DC=power,DC=cc23', # where to find users
-            'domainUser': f'CN=SCPAdmin,CN=Users,DC=spectrum,DC={zeroOctet},DC=power,DC=cc23', # domain user DN (to find users for ldap auth)
+            'serverIP': f'192.168.96.{strOctet}',  # ip of rocket chat
+            'domainIP': f'10.199.{strOctet}.50', # ip of domain controller
+            'domainDN': f'DC=domain,DC={zeroOctet},DC=power,DC=local', # where to find users
+            'domainUser': f'CN=SCPAdmin,CN=Users,DC=domain,DC={zeroOctet},DC=power,DC=local', # domain user DN (to find users for ldap auth)
             'myMail': "h.training.scpc@gmail.com"  # mail acount for activation rocket chat (letter will be sended here for step setup 4)
         }
     return variables
@@ -103,8 +105,8 @@ if not login(driver, f"{username1}@rct.local", "Admin1Admin1"): # change only pa
 
 # also remake if you do not use octet, and change halfIP
 def mainDeploySender(octet, index):
-    halfIp = '198.18.96.'   # change ip
-    
+    halfIp = '192.168.96.'   # change ip
+
 def mainTestSender(octet, index):
     halfIp = '10.10.20.' # change ip
 
@@ -118,12 +120,12 @@ In ./Main run command:
 pyinstaller .\botRocketAlone.py --onefile --hidden-import selenium --hidden-import rcRegistration --hidden-import multiSender --hidden-import paramiko --hidden-import sshRocketCfg --icon=icon.ico --name botRocketAloneDeploy.exe
 ```
 ### Anouther way is building
-in In ./Main run `build.ps1`;
+In `./Main` run `build.ps1`;
 Enter the version ex: `130` (for 1.3.0) it will be added at the end of file name, than select `d` option for deploy
 
 File will be in
 ```
-CC23\Main\dist\botRocketAloneDeploy_v130.py
+Rocketchat-automate-registration\Main\dist\botRocketAloneDeploy_v130.exe
 ```
 
 ## Versions
@@ -135,4 +137,4 @@ Rocketchat 6.4.5
 
 The MIT License (MIT)
 
-Copyright (c) 2022 Heorhii Savoiskyi d3f0ld@proton.me
+Copyright (c) 2023 Heorhii Savoiskyi d3f0ld@proton.me

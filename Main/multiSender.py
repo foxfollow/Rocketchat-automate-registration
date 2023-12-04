@@ -11,9 +11,6 @@ import datetime
 import concurrent.futures
 from rcRegistration import check_server
 
-# third_aktet = socket.gethostbyname(socket.gethostname()).split('.')[2]
-# url_server = f'http://198.18.96.{third_aktet}:3000/'
-# url_server = 'http://10.10.20.31:3000/'
 username1 = "operator1"
 username2 = "operator2"
 
@@ -119,7 +116,7 @@ def answer(url_server):
 
 
 def mainDeploySender(octet, index):
-    halfIp = '198.18.96.'
+    halfIp = '192.168.96.'
     if index == 1:
         url_server = f'http://{halfIp + str(octet)}:3000/'
         sender(url_server)

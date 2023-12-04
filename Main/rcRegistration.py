@@ -44,10 +44,10 @@ def getValues(isDeploy, thirdOctet):
         else:
             zeroOctet = strOctet
         variables = {
-            'serverIP': f'198.18.96.{strOctet}',
+            'serverIP': f'192.168.96.{strOctet}',
             'domainIP': f'10.122.{strOctet}.113',
-            'domainDN': f'DC=spectrum,DC={zeroOctet},DC=power,DC=cc23',
-            'domainUser': f'CN=SPCAdmin,CN=Users,DC=spectrum,DC={zeroOctet},DC=power,DC=cc23',
+            'domainDN': f'DC=domain,DC={zeroOctet},DC=power,DC=local',
+            'domainUser': f'CN=SPCAdmin,CN=Users,DC=domain,DC={zeroOctet},DC=power,DC=local',
             'myMail': "h.training.scpc@gmail.com"
         }
     return variables
